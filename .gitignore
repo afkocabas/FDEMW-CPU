@@ -1,0 +1,9 @@
+# Files
+*.vcd
+verible.filelist
+*.jou
+*.log
+
+# Dirs
+obj_dir
+peakrdl-env
