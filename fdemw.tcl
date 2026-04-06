@@ -5,11 +5,12 @@ set device "xc7a35tcpg236-1"
 
 set project_name "fdemw_cpu_project"
 set top_module "fdemw_top"
-set constrain "./cons/cons.xdc"
+set constrain "./constrains/constrain.xdc"
 set nthreads 4
 
-# Find all systemverilog files under .src and save it to the variable.
+# Find all systemverilog and memory files under .src and save it to the variable.
 set sv_files [exec find ./src -name "*.sv"]
+set mem_files [exec find ./src -name "*.mem"]
 
 # ----------------------------------------- VARIABLES -----------------------------------------
 
@@ -18,8 +19,11 @@ set sv_files [exec find ./src -name "*.sv"]
 # Create a project and force it.
 create_project -force $project_name ./$project_name -part $device
 
-# Add all files to the project.
+# Add all systemverilog files to the project.
 add_files $sv_files
+
+# Add all memory files to the project.
+add_files $mem_files
 
 # Add the constrain file
 add_files -fileset constrs_1 $constrain
@@ -37,6 +41,9 @@ update_compile_order -fileset sources_1
 # Run synthesis with nthreads.
 launch_runs synth_1 -jobs $nthreads
 wait_on_run synth_1
+
+# Open synthesized design
+open_run synth_1
 
 # Report resource utilization
 report_utilization -file ./$project_name/synth_utilization.rpt
