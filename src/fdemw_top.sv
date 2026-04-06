@@ -20,6 +20,9 @@ module fdemw_top (
 
   always_comb begin : assign_comb
     an_o_c = 4'b1110;
+    // WARN: Write data path inactived.
+    mem_wr_en = 1'b0;
+    mem_data_i = '0;
   end
 
   always_comb begin : seg_comb
@@ -49,7 +52,7 @@ module fdemw_top (
       .clk_i(clk_i),
       .res_i(res_i),
 
-      .adrr_o(fetch_addr)
+      .addr_o(fetch_addr)
   );
 
   main_mem mem (

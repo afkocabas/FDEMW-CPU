@@ -4,7 +4,7 @@ module fetch (
     input logic clk_i,
     input logic res_i,
 
-    output addr_t adrr_o
+    output addr_t addr_o
 );
 
   /* State Registers and Next State Signals*/
@@ -41,6 +41,6 @@ module fetch (
 
   end
 
-  assign adrr_o = prg_cnt_q;
+  assign addr_o = prg_cnt_q;
 
 endmodule
