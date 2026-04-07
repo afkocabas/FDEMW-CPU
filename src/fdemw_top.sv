@@ -1,4 +1,5 @@
 import fdemw_pkg::*;
+import riscv32i_pkg::*;
 
 module fdemw_top (
     input logic clk_i,
@@ -10,9 +11,8 @@ module fdemw_top (
 
   // Internal signals (wires of other modules)
   addr_t fetch_addr;
-  byte_t mem_data_o, mem_data_i;
-  logic mem_wr_en;
-
+  inst_t i_mem_o;
+  inst_kind_e dec_inst_kind;
 
   // Internal signals
   logic [3:0] an_o_c;
@@ -20,30 +20,19 @@ module fdemw_top (
 
   always_comb begin : assign_comb
     an_o_c = 4'b1110;
-    // WARN: Write data path inactived.
-    mem_wr_en = 1'b0;
-    mem_data_i = '0;
   end
 
+
   always_comb begin : seg_comb
-    unique case (mem_data_o)
-      8'h00:   seg_o_c = 7'b1000000;
-      8'h01:   seg_o_c = 7'b1111001;
-      8'h02:   seg_o_c = 7'b0100100;
-      8'h03:   seg_o_c = 7'b0110000;
-      8'h04:   seg_o_c = 7'b0011001;
-      8'h05:   seg_o_c = 7'b0010010;
-      8'h06:   seg_o_c = 7'b0000010;
-      8'h07:   seg_o_c = 7'b1111000;
-      8'h08:   seg_o_c = 7'b0000000;
-      8'h09:   seg_o_c = 7'b0010000;
-      8'h0a:   seg_o_c = 7'b0001000;
-      8'h0b:   seg_o_c = 7'b0000011;
-      8'h0c:   seg_o_c = 7'b1000110;
-      8'h0d:   seg_o_c = 7'b0100001;
-      8'h0e:   seg_o_c = 7'b0000110;
-      8'h0f:   seg_o_c = 7'b0001110;
-      default: seg_o_c = 7'b1000000;
+    unique case (dec_inst_kind)
+      R_T: seg_o_c = 7'b0001000;
+      I_T: seg_o_c = 7'b1001111;
+      S_T: seg_o_c = 7'b0010010;
+      B_T: seg_o_c = 7'b0000000;
+      U_T: seg_o_c = 7'b1000001;
+      J_T: seg_o_c = 7'b1100001;
+      INVALID_T: seg_o_c = 7'b0111111;
+      default: seg_o_c = 7'b0111111;
     endcase
   end
 
@@ -55,13 +44,19 @@ module fdemw_top (
       .addr_o(fetch_addr)
   );
 
-  main_mem mem (
+  decode decode_core (
       .clk_i (clk_i),
-      .wr_en (mem_wr_en),
-      .addr_i(fetch_addr),
-      .data_i(mem_data_i),
+      .res_i (res_i),
+      .inst_i(i_mem_o),
 
-      .data_o(mem_data_o)
+      .inst_kind_o(dec_inst_kind)
+  );
+
+  inst_mem i_mem (
+      .clk_i (clk_i),
+      .addr_i(fetch_addr),
+
+      .inst_o(i_mem_o)
   );
 
   assign an_o  = an_o_c;

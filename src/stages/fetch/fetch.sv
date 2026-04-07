@@ -23,7 +23,7 @@ module fetch (
 
     if (is_cnt_done) begin
       cnt_d = '0;
-      prg_cnt_d = prg_cnt_q + 1;
+      prg_cnt_d = prg_cnt_q + 4;
     end else begin
       cnt_d = cnt_q + 1;
     end
