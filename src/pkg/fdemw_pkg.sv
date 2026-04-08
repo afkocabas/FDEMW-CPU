@@ -1,5 +1,8 @@
 package fdemw_pkg;
 
+  parameter logic HIGH = 1'b1;
+  parameter logic LOW = 1'b0;
+
   parameter int BYTE_WIDTH = 8;
 
   parameter int ADDR_WIDTH = 10;
@@ -30,7 +33,6 @@ package fdemw_pkg;
   } addr_t;
 
   // Typedefinitions
-  // typedef logic [ADDR_WIDTH - 1:0] addr_t;
   typedef logic [WORD_WIDTH - 1:0] word_t;
   typedef logic [7:0] byte_t;
   typedef logic [6:0] seg_t;
