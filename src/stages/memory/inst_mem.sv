@@ -1,10 +1,9 @@
 import fdemw_pkg::*;
 
 module inst_mem (
-    input logic  clk_i,
-    input addr_t addr_i,
+    input logic clk_i,
 
-    output inst_t inst_o
+    imem_if.imem fetch_if
 );
 
   (* ram_style = "block" *)
@@ -15,7 +14,8 @@ module inst_mem (
   end
 
   always_ff @(posedge clk_i) begin : seq_block
-    inst_o <= mem[addr_i.fields.word_idx];
+    fetch_if.inst <= mem[fetch_if.inst_addr.fields.word_idx];
+    fetch_if.resp_valid <= fetch_if.req_valid;
   end
 
 endmodule
