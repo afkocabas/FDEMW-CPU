@@ -15,7 +15,7 @@ module fdemw_top (
 );
 
   // Internal signals (wires of other modules)
-  inst_kind_e dec_inst_kind;
+  inst_format_e dec_inst_kind;
 
   // Pipeline registers
   if_id_reg_t if_id_reg_q, if_id_reg_d;
@@ -56,6 +56,8 @@ module fdemw_top (
 
       .if_id_o(if_id_o)
   );
+
+  // ------------- Decode --------------------
 
   decode decode_core (
       .clk_i(clk_i),

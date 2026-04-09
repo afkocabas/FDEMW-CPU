@@ -7,14 +7,14 @@ module decode (
 
     input if_id_reg_t if_id_reg_i,
 
-    output inst_kind_e inst_kind_o
+    output inst_format_e inst_kind_o
 
 );
 
-  inst_kind_e inst_kind_o_c;
+  inst_format_e inst_kind_o_c;
 
   always_comb begin : comb_block
-    inst_kind_o_c = get_inst_kind(if_id_reg_i.inst);
+    inst_kind_o_c = get_inst_format(if_id_reg_i.inst);
   end
 
   assign inst_kind_o = inst_kind_o_c;
