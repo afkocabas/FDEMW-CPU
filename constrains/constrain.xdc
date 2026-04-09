@@ -10,7 +10,7 @@ create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports clk
 
 ## Switches
 set_property -dict { PACKAGE_PIN V17   IOSTANDARD LVCMOS33 } [get_ports {stall_i}]
-# set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports {num_i[1]}]
+set_property -dict { PACKAGE_PIN V16   IOSTANDARD LVCMOS33 } [get_ports {flush_i}]
 # set_property -dict { PACKAGE_PIN W16   IOSTANDARD LVCMOS33 } [get_ports {num_i[2]}]
 # set_property -dict { PACKAGE_PIN W17   IOSTANDARD LVCMOS33 } [get_ports {num_i[3]}]
 #set_property -dict { PACKAGE_PIN W15   IOSTANDARD LVCMOS33 } [get_ports {sw[4]}]

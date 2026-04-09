@@ -8,6 +8,7 @@ module fdemw_top (
 
 
     input logic stall_i,
+    input logic flush_i,
 
     output seg_t seg_o,
     output logic [3:0] an_o
@@ -16,7 +17,10 @@ module fdemw_top (
   // Internal signals (wires of other modules)
   inst_kind_e dec_inst_kind;
 
-  if_id_reg_t if_id_reg;
+  // Pipeline registers
+  if_id_reg_t if_id_reg_q, if_id_reg_d;
+
+  // Interfaces
   imem_if imem_iff ();
 
   // Internal signals
@@ -40,21 +44,24 @@ module fdemw_top (
     endcase
   end
 
+  // ------------- Fetch --------------------
+  if_id_reg_t if_id_o;
 
   fetch fetch_core (
-      .clk_i(clk_i),
-      .res_i(res_i),
+      .clk_i  (clk_i),
+      .res_i  (res_i),
+      .stall_i(stall_i),
 
       .imem_if(imem_iff.fetch),
-      .if_id_o(if_id_reg),
-      .stall_i(stall_i)
+
+      .if_id_o(if_id_o)
   );
 
   decode decode_core (
       .clk_i(clk_i),
       .res_i(res_i),
 
-      .if_id_reg_i(if_id_reg),
+      .if_id_reg_i(if_id_reg_q),
       .inst_kind_o(dec_inst_kind)
   );
 
@@ -63,6 +70,28 @@ module fdemw_top (
 
       .fetch_if(imem_iff.imem)
   );
+
+
+  always_comb begin : reg_updates
+    if_id_reg_d = if_id_reg_q;
+
+    if (flush_i) begin
+      if_id_reg_d = '0;
+    end else if (stall_i) begin
+      if_id_reg_d = if_id_reg_q;
+    end else if (if_id_o.valid) begin
+      if_id_reg_d = if_id_o;
+    end
+  end
+
+
+  always_ff @(posedge clk_i) begin : top_seq
+    if (res_i) begin
+      if_id_reg_q <= '0;
+    end else begin
+      if_id_reg_q <= if_id_reg_d;
+    end
+  end
 
   assign an_o  = an_o_c;
   assign seg_o = seg_o_c;
