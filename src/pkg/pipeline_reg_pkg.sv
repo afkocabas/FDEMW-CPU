@@ -8,4 +8,6 @@ package pipeline_reg_pkg;
     addr_t pc;
   } if_id_reg_t;
 
+  typedef struct packed {logic valid;} id_exe_reg_t;
+
 endpackage
