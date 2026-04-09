@@ -75,7 +75,7 @@ package riscv32i_pkg;
     INVALID_T
   } inst_format_e;
 
-  function automatic inst_format_e get_inst_kind(inst_t inst);
+  function automatic inst_format_e get_inst_format(inst_t inst);
     logic [6:0] opcode;
     opcode = inst[6:0];
 
