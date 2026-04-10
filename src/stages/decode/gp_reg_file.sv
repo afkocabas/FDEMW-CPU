@@ -6,14 +6,14 @@ module gp_reg_file (
 
     // Read ports (2)
     input logic   r_en_1_i,
-    input reg_idx r_idx_1_i,
+    input reg_idx_t r_idx_1_i,
 
     input logic   r_en_2_i,
-    input reg_idx r_idx_2_i,
+    input reg_idx_t r_idx_2_i,
 
     // Write ports (1)
     input logic wr_en_i,
-    input reg_idx wr_idx_i,
+    input reg_idx_t wr_idx_i,
     input gp_reg_t wr_data_i,
 
     output gp_reg_t r_data_1_o,
