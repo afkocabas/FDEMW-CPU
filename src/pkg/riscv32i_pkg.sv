@@ -1,3 +1,4 @@
+import fdemw_pkg::*;
 package riscv32i_pkg;
 
   import fdemw_pkg::*;
@@ -72,8 +73,55 @@ package riscv32i_pkg;
     B_T,
     U_T,
     J_T,
-    INVALID_T
+    INST_INVALID
   } inst_format_e;
+
+
+  typedef enum logic [3:0] {
+    ADD,   // rs1 + rs2
+    SUB,   // rs1 - rs2
+    SLL,   // shift left logical
+    SLT,   // signed less than
+    SLTU,  // unsigned less than
+    XOR,   // bitwise xor
+    SRL,   // shift right logical
+    SRA,   // shift right arithmetic
+    OR,    // bitwise or
+    AND,   // bitwise and
+
+    PASS_B,   // for LUI
+    PASS_A,   // sometimes useful
+    ALU_NONE  // default / no-op / illegal
+  } alu_op_t;
+
+  typedef logic [INST_WIDTH-1:0] imm_t;
+
+  typedef enum logic [1:0] {
+    SRC1_RS1,
+    SRC1_IMM,
+    SRC1_ZERO
+  } alu_src1_t;
+
+  typedef enum logic {
+    SRC2_RS2,
+    SRC2_IMM
+  } alu_src2_t;
+
+  typedef enum logic [1:0] {
+    WB_ALU,
+    WB_MEM,
+    WB_PC4
+  } wb_sel_t;
+
+  typedef enum logic [2:0] {
+    BR_NONE,
+    BR_BEQ,
+    BR_BNE,
+    BR_BLT,
+    BR_BGE,
+    BR_BLTU,
+    BR_BGEU
+  } branch_type_t;
 
   function automatic inst_format_e get_inst_format(inst_t inst);
     logic [6:0] opcode;
@@ -96,7 +144,32 @@ package riscv32i_pkg;
 
       7'b1101111: return J_T;  // JAL
 
-      default: return INVALID_T;
+      default: return INST_INVALID;
+    endcase
+  endfunction
+
+  function automatic alu_op_t get_alu_op_r_t(logic [6:0] funct7, logic [2:0] funct3);
+    unique case ({
+      funct7, funct3
+    })
+      10'b0000000_000: return ADD;
+      10'b0100000_000: return SUB;
+
+      10'b0000000_001: return SLL;
+
+      10'b0000000_010: return SLT;
+      10'b0000000_011: return SLTU;
+
+      10'b0000000_100: return XOR;
+
+      10'b0000000_101: return SRL;
+      10'b0100000_101: return SRA;
+
+      10'b0000000_110: return OR;
+      10'b0000000_111: return AND;
+
+      default: return ALU_NONE;
+
     endcase
   endfunction
 

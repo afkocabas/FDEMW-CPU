@@ -45,6 +45,6 @@ package fdemw_pkg;
   typedef logic [6:0] seg_t;
   typedef logic [GP_REG_WIDTH - 1:0] gp_reg_t;
   typedef gp_reg_t reg_file_t[REG_FILE_DEPTH-1:0];
-  typedef logic [REG_FILE_IDX_NBITS - 1:0] reg_idx;
+  typedef logic [REG_FILE_IDX_NBITS - 1:0] reg_idx_t;
 
 endpackage

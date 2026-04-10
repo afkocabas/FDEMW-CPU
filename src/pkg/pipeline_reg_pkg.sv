@@ -8,6 +8,31 @@ package pipeline_reg_pkg;
     addr_t pc;
   } if_id_reg_t;
 
-  typedef struct packed {logic valid;} id_exe_reg_t;
+  typedef struct packed {
+    inst_format_e inst_kind;
+    imm_t imm;
+    reg_idx_t rd_idx;
+    alu_op_t alu_op;
+    addr_t pc;
+    alu_src1_t alu_src1;
+    alu_src2_t alu_src2;
+    wb_sel_t wb_sel;
+    branch_type_t branch_type;
+
+    logic valid;
+    logic illegal_inst;
+    logic uses_rs1;
+    logic uses_rs2;
+    logic is_reg_write;
+    logic is_mem_read;
+    logic is_mem_write;
+    logic is_branch;
+    logic is_jal;
+    logic is_jalr;
+
+
+    gp_reg_t rs1_data;
+    gp_reg_t rs2_data;
+  } id_exe_reg_t;
 
 endpackage
