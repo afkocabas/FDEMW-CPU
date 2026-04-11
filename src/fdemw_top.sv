@@ -20,6 +20,7 @@ module fdemw_top (
   // Pipeline registers
   if_id_reg_t if_id_reg_q, if_id_reg_d;
   id_exe_reg_t id_exe_reg_q, id_exe_reg_d;
+  exe_mem_reg_t exe_mem_reg_q, exe_mem_reg_d;
 
   // Interfaces
   imem_if imem_iff ();
@@ -32,21 +33,8 @@ module fdemw_top (
     an_o_c = 4'b1110;
   end
 
-  // always_comb begin : seg_comb
-  //   unique case (dec_inst_kind)
-  //     R_T: seg_o_c = 7'b0001000;
-  //     I_T: seg_o_c = 7'b1001111;
-  //     S_T: seg_o_c = 7'b0010010;
-  //     B_T: seg_o_c = 7'b0000000;
-  //     U_T: seg_o_c = 7'b1000001;
-  //     J_T: seg_o_c = 7'b1100001;
-  //     INST_INVALID: seg_o_c = 7'b0111111;
-  //     default: seg_o_c = 7'b0111111;
-  //   endcase
-  // end
-
   always_comb begin : seg_comb
-    unique case (id_exe_reg_q.rd_idx)
+    unique case (exe_mem_reg_q.id_exe_reg.rd_idx)
       4'd0: seg_o_c = 7'b1000000;  // 0
       4'd1: seg_o_c = 7'b1111001;  // 1
       4'd2: seg_o_c = 7'b0100100;  // 2
@@ -140,6 +128,14 @@ module fdemw_top (
       .r_data_2_o(id_exe_o.rs2_data)
   );
 
+  // ------------- Execute --------------------
+
+  exe_mem_reg_t exe_mem_o;
+  execute execute_core (
+      .id_exe_reg_i (id_exe_reg_q),
+      .exe_mem_reg_o(exe_mem_o)
+  );
+
   // ------------- Instruction Memory --------------------
 
   inst_mem i_mem (
@@ -164,25 +160,31 @@ module fdemw_top (
 
   end
   always_comb begin
-    id_exe_reg_d = id_exe_reg_q;
+    id_exe_reg_d  = id_exe_reg_q;
+    exe_mem_reg_d = exe_mem_reg_q;
 
     if (flush_i) begin
-      id_exe_reg_d = '0;
+      id_exe_reg_d  = '0;
+      exe_mem_reg_d = '0;
     end else if (stall_i) begin
-      id_exe_reg_d = id_exe_reg_q;
+      id_exe_reg_d  = id_exe_reg_q;
+      exe_mem_reg_d = exe_mem_reg_q;
     end else begin
-      id_exe_reg_d = id_exe_o;
+      id_exe_reg_d  = id_exe_o;
+      exe_mem_reg_d = exe_mem_o;
     end
 
   end
 
   always_ff @(posedge clk_i) begin : top_seq
     if (res_i) begin
-      if_id_reg_q  <= '0;
-      id_exe_reg_q <= '0;
+      if_id_reg_q   <= '0;
+      id_exe_reg_q  <= '0;
+      exe_mem_reg_q <= '0;
     end else begin
-      if_id_reg_q  <= if_id_reg_d;
-      id_exe_reg_q <= id_exe_reg_d;
+      if_id_reg_q   <= if_id_reg_d;
+      id_exe_reg_q  <= id_exe_reg_d;
+      exe_mem_reg_q <= exe_mem_reg_d;
     end
   end
 
