@@ -35,4 +35,9 @@ package pipeline_reg_pkg;
     gp_reg_t rs2_data;
   } id_exe_reg_t;
 
+  typedef struct packed {
+    id_exe_reg_t id_exe_reg;
+    gp_reg_t alu_result;
+  } exe_mem_reg_t;
+
 endpackage
