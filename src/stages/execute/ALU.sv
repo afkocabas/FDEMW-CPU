@@ -1,8 +1,10 @@
+import riscv32i_pkg::*;
+
 module ALU (
 
-    input alu_op_t   alu_op_i,
-    input alu_src1_t op_a_i,
-    input alu_src2_t op_b_i,
+    input alu_op_t alu_op_i,
+    input gp_reg_t op_a_i,
+    input gp_reg_t op_b_i,
 
     output gp_reg_t alu_result_o
 
