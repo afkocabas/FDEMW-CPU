@@ -74,7 +74,7 @@ module fdemw_top (
 
       .if_id_reg_i(if_id_reg_q),
 
-      .inst_kind_o(id_exe_o.inst_kind),
+      .inst_format_o(id_exe_o.inst_format),
       .imm_o(id_exe_o.imm),
       .rd_idx_o(id_exe_o.rd_idx),
       .alu_op_o(id_exe_o.alu_op),
