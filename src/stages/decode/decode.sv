@@ -159,6 +159,40 @@ module decode (
         rs2_idx_o = inst.s.rs2;
 
       end
+      U_T: begin
+        imm_o = {inst.u.imm_31_12, 12'b0};
+        rd_idx_o = inst.u.rd;
+        alu_op_o = ADD;
+        pc_o = pc;
+        branch_type_o = BR_NONE;
+        uses_rs1_o = LOW;
+        uses_rs2_o = LOW;
+        is_mem_read_o = LOW;
+        is_mem_write_o = LOW;
+        is_branch_o = LOW;
+        is_jal_o = LOW;
+        is_jalr_o = LOW;
+        wb_sel_o = WB_ALU;
+        is_reg_write_o = HIGH;
+
+        rs1_idx_o = '0;
+        rs2_idx_o = '0;
+
+        unique case (inst_kind)
+          IK_LUI: begin
+            alu_src1_o = SRC1_ZERO;
+            alu_src2_o = SRC2_IMM;
+          end
+          IK_AUIPC: begin
+            alu_src1_o = SRC1_PC;
+            alu_src2_o = SRC2_IMM;
+          end
+        endcase
+
+        valid_o = is_valid_u_t(inst_kind);
+        illegal_inst_o = !valid_o;
+
+      end
     endcase
   end
 

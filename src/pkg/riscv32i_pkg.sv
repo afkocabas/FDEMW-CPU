@@ -124,6 +124,7 @@ package riscv32i_pkg;
   typedef enum logic [1:0] {
     SRC1_RS1,
     SRC1_IMM,
+    SRC1_PC,
     SRC1_ZERO
   } alu_src1_t;
 
@@ -216,8 +217,6 @@ package riscv32i_pkg;
     endcase
   endfunction
 
-
-
   // ALU operation decoding by instruction format
 
   function automatic alu_op_t get_alu_op_i_t(logic [6:0] funct7, logic [2:0] funct3);
@@ -289,6 +288,10 @@ package riscv32i_pkg;
       3'b000, 3'b001, 3'b010: return 1'b1;
       default: return 1'b0;
     endcase
+  endfunction
+
+  function automatic logic is_valid_u_t(inst_kind_e inst_kind);
+    return (inst_kind == IK_LUI) || (inst_kind == IK_AUIPC);
   endfunction
 
 endpackage
