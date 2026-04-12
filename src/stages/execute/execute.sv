@@ -15,6 +15,7 @@ module execute (
       SRC1_RS1:  op_a = id_exe_reg_i.rs1_data;
       SRC1_IMM:  op_a = id_exe_reg_i.imm;
       SRC1_ZERO: op_a = '0;
+      SRC1_PC:   op_a = id_exe_reg_i.pc;
       default:   op_a = '0;
 
     endcase
