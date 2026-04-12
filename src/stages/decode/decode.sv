@@ -6,7 +6,7 @@ module decode (
     input if_id_reg_t if_id_reg_i,
 
     // To ID/EXE
-    output inst_format_e inst_kind_o,
+    output inst_format_e inst_format_o,
     output imm_t imm_o,
     output reg_idx_t rd_idx_o,
     output alu_op_t alu_op_o,
@@ -38,8 +38,11 @@ module decode (
   inst_t inst = if_id_reg_i.inst;
   addr_t pc = if_id_reg_i.pc;
 
+  inst_kind_e inst_kind = get_inst_kind(inst);
+
   always_comb begin : output_comb
-    inst_kind_o = get_inst_format(if_id_reg_i.inst);
+    inst_format_o = get_inst_format(inst);
+
     imm_o = '0;
     rd_idx_o = inst.r.rd;
     alu_op_o = get_alu_op_r_t(inst.r.funct7, inst.r.funct3);
@@ -60,14 +63,12 @@ module decode (
     is_jal_o = LOW;
     is_jalr_o = LOW;
 
-
     rs1_idx_o = inst.r.rs1;
     rs2_idx_o = inst.r.rs2;
 
-    unique case (inst_kind_o)
+    unique case (inst_format_o)
       R_T: begin
 
-        inst_kind_o = get_inst_format(if_id_reg_i.inst);
         imm_o = '0;
         rd_idx_o = inst.r.rd;
         alu_op_o = get_alu_op_r_t(inst.r.funct7, inst.r.funct3);
@@ -77,8 +78,8 @@ module decode (
         wb_sel_o = WB_ALU;
         branch_type_o = BR_NONE;
 
-        valid_o = !(alu_op_o == ALU_NONE) && !(inst_kind_o == INST_INVALID);
-        illegal_inst_o = (inst_kind_o == INST_INVALID);
+        valid_o = !(alu_op_o == ALU_NONE);
+        illegal_inst_o = !valid_o;
         uses_rs1_o = HIGH;
         uses_rs2_o = HIGH;
         is_reg_write_o = HIGH;
@@ -91,6 +92,71 @@ module decode (
 
         rs1_idx_o = inst.r.rs1;
         rs2_idx_o = inst.r.rs2;
+
+      end
+      I_T: begin
+        imm_o = {{20{inst.i.imm[11]}}, inst.i.imm};
+        rd_idx_o = inst.i.rd;
+        pc_o = pc;
+        alu_src1_o = SRC1_RS1;
+        alu_src2_o = SRC2_IMM;
+        branch_type_o = BR_NONE;
+        uses_rs1_o = HIGH;
+        uses_rs2_o = LOW;
+        is_reg_write_o = HIGH;
+        is_mem_write_o = LOW;
+        is_branch_o = LOW;
+        is_jal_o = LOW;
+        is_jalr_o = LOW;
+        rs1_idx_o = inst.i.rs1;
+        rs2_idx_o = '0;
+        valid_o = is_valid_i_t(inst_kind, inst.i.imm[11:5], inst.i.funct3);
+        illegal_inst_o = !valid_o;
+
+        unique case (inst_kind)
+          IK_I_ALU: begin
+            wb_sel_o = WB_ALU;
+            is_mem_read_o = LOW;
+            alu_op_o = get_alu_op_i_t(inst.i.imm[11:5], inst.i.funct3);
+          end
+          IK_LOAD: begin
+            wb_sel_o = WB_MEM;
+            is_mem_read_o = HIGH;
+            alu_op_o = ADD;
+          end
+          IK_JALR: begin
+            wb_sel_o      = WB_PC4;
+            is_mem_read_o = LOW;
+            alu_op_o      = ADD;
+            is_jalr_o     = HIGH;
+          end
+        endcase
+
+      end
+      S_T: begin
+
+        imm_o = {{20{inst.s.imm_11_5[6]}}, inst.s.imm_11_5, inst.s.imm_4_0};
+        rd_idx_o = '0;
+        alu_op_o = ADD;
+        pc_o = pc;
+        alu_src1_o = SRC1_RS1;
+        alu_src2_o = SRC2_IMM;
+        wb_sel_o = WB_NONE;
+        branch_type_o = BR_NONE;
+
+        valid_o = is_valid_s_t(inst.s.funct3);
+        illegal_inst_o = !valid_o;
+        uses_rs1_o = HIGH;
+        uses_rs2_o = HIGH;
+        is_reg_write_o = LOW;
+        is_mem_read_o = LOW;
+        is_mem_write_o = HIGH;
+        is_branch_o = LOW;
+        is_jal_o = LOW;
+        is_jalr_o = LOW;
+
+        rs1_idx_o = inst.s.rs1;
+        rs2_idx_o = inst.s.rs2;
 
       end
     endcase
