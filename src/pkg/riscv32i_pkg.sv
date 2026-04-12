@@ -294,4 +294,17 @@ package riscv32i_pkg;
     return (inst_kind == IK_LUI) || (inst_kind == IK_AUIPC);
   endfunction
 
+
+  function automatic branch_type_t get_branch_type(logic [2:0] funct3);
+    unique case (funct3)
+      3'b000:  return BR_EQ;  // beq
+      3'b001:  return BR_NE;  // bne
+      3'b100:  return BR_LT;  // blt
+      3'b101:  return BR_GE;  // bge
+      3'b110:  return BR_LTU;  // bltu
+      3'b111:  return BR_GEU;  // bgeu
+      default: return BR_NONE;
+    endcase
+  endfunction
+
 endpackage

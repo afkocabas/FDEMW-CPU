@@ -193,6 +193,36 @@ module decode (
         illegal_inst_o = !valid_o;
 
       end
+      B_T: begin
+        imm_o = {
+          {19{inst.b.imm_12}}, inst.b.imm_12, inst.b.imm_11, inst.b.imm_10_5, inst.b.imm_4_1, 1'b0
+        };
+
+        rd_idx_o = '0;
+        alu_op_o = SUB;
+        pc_o = pc;
+        alu_src1_o = SRC1_RS1;
+        alu_src2_o = SRC2_RS2;
+        wb_sel_o = WB_NONE;
+
+        uses_rs1_o = HIGH;
+        uses_rs2_o = HIGH;
+        is_reg_write_o = LOW;
+        is_mem_read_o = LOW;
+        is_mem_write_o = LOW;
+        is_branch_o = HIGH;
+        is_jal_o = LOW;
+        is_jalr_o = LOW;
+
+        rs1_idx_o = inst.b.rs1;
+        rs2_idx_o = inst.b.rs2;
+
+        branch_type_o = get_branch_type(inst.b.funct3);
+
+        valid_o = (branch_type_o != BR_NONE);
+        illegal_inst_o = !valid_o;
+
+      end
     endcase
   end
 
