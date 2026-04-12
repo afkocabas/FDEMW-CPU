@@ -76,6 +76,31 @@ package riscv32i_pkg;
     INST_INVALID
   } inst_format_e;
 
+  typedef enum logic [3:0] {
+    // R-type
+    IK_R_ALU,
+
+    // I-type
+    IK_I_ALU,
+    IK_LOAD,
+    IK_JALR,
+
+    // S-type
+    IK_STORE,
+
+    // B-type
+    IK_BRANCH,
+
+    // J-type
+    IK_JAL,
+
+    // U-type
+    IK_LUI,
+    IK_AUIPC,
+
+    // Invalid
+    IK_INVALID
+  } inst_kind_e;
 
   typedef enum logic [3:0] {
     ADD,   // rs1 + rs2
@@ -170,6 +195,99 @@ package riscv32i_pkg;
 
       default: return ALU_NONE;
 
+    endcase
+  endfunction
+
+  function automatic inst_kind_e get_inst_kind(inst_t inst);
+    logic [6:0] opcode;
+    opcode = inst[6:0];
+
+    unique case (opcode)
+      7'b0110011: return IK_R_ALU;
+      7'b0010011: return IK_I_ALU;
+      7'b0000011: return IK_LOAD;
+      7'b0100011: return IK_STORE;
+      7'b1100011: return IK_BRANCH;
+      7'b1101111: return IK_JAL;
+      7'b1100111: return IK_JALR;
+      7'b0110111: return IK_LUI;
+      7'b0010111: return IK_AUIPC;
+      default:    return IK_INVALID;
+    endcase
+  endfunction
+
+
+
+  // ALU operation decoding by instruction format
+
+  function automatic alu_op_t get_alu_op_i_t(logic [6:0] funct7, logic [2:0] funct3);
+    unique case (funct3)
+
+      3'b000: return ADD;
+
+      3'b010: return SLT;
+      3'b011: return SLTU;
+
+      3'b100: return XOR;
+      3'b110: return OR;
+      3'b111: return AND;
+
+      3'b001: return SLL;
+
+      3'b101: begin
+        if (funct7 == 7'b0000000) return SRL;  // srli
+        else if (funct7 == 7'b0100000) return SRA;  // srai
+        else return ALU_NONE;
+      end
+
+      default: return ALU_NONE;
+
+    endcase
+  endfunction
+
+
+  function automatic alu_op_t get_alu_op_s_t(logic [2:0] funct3);
+    unique case (funct3)
+
+      3'b000: return ADD;  // sb
+      3'b001: return ADD;  // sh
+      3'b010: return ADD;  // sw
+
+      default: return ALU_NONE;
+
+    endcase
+  endfunction
+
+
+  // -------------------------------- Instruction Validity Checks -----------------------------
+
+  function automatic logic is_valid_i_t(inst_kind_e kind, logic [6:0] funct7, logic [2:0] funct3);
+    unique case (kind)
+
+      IK_I_ALU: begin
+        return (get_alu_op_i_t(funct7, funct3) != ALU_NONE);
+      end
+
+      IK_LOAD: begin
+        unique case (funct3)
+          3'b000, 3'b001, 3'b010, 3'b100, 3'b101: return 1'b1;
+          default: return 1'b0;
+        endcase
+      end
+
+      IK_JALR: begin
+        return (funct3 == 3'b000);
+      end
+
+      default: return 1'b0;
+
+    endcase
+  endfunction
+
+  function automatic logic is_valid_s_t(logic [2:0] funct3);
+    unique case (funct3)
+      3'b000, 3'b001, 3'b010: return 1'b1;
+      default: return 1'b0;
     endcase
   endfunction
 
