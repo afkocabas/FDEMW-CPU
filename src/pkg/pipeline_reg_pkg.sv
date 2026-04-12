@@ -9,7 +9,7 @@ package pipeline_reg_pkg;
   } if_id_reg_t;
 
   typedef struct packed {
-    inst_format_e inst_kind;
+    inst_format_e inst_format;
     imm_t imm;
     reg_idx_t rd_idx;
     alu_op_t alu_op;
