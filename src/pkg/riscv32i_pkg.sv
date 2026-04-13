@@ -122,10 +122,10 @@ package riscv32i_pkg;
   typedef logic [INST_WIDTH-1:0] imm_t;
 
   typedef enum logic [1:0] {
+    SRC1_ZERO,
     SRC1_RS1,
     SRC1_IMM,
-    SRC1_PC,
-    SRC1_ZERO
+    SRC1_PC
   } alu_src1_t;
 
   typedef enum logic {
@@ -134,6 +134,7 @@ package riscv32i_pkg;
   } alu_src2_t;
 
   typedef enum logic [1:0] {
+    WB_NONE,
     WB_ALU,
     WB_MEM,
     WB_PC4
@@ -297,12 +298,12 @@ package riscv32i_pkg;
 
   function automatic branch_type_t get_branch_type(logic [2:0] funct3);
     unique case (funct3)
-      3'b000:  return BR_EQ;  // beq
-      3'b001:  return BR_NE;  // bne
-      3'b100:  return BR_LT;  // blt
-      3'b101:  return BR_GE;  // bge
-      3'b110:  return BR_LTU;  // bltu
-      3'b111:  return BR_GEU;  // bgeu
+      3'b000:  return BR_BEQ;  // beq
+      3'b001:  return BR_BNE;  // bne
+      3'b100:  return BR_BLT;  // blt
+      3'b101:  return BR_BGE;  // bge
+      3'b110:  return BR_BLTU;  // bltu
+      3'b111:  return BR_BGEU;  // bgeu
       default: return BR_NONE;
     endcase
   endfunction

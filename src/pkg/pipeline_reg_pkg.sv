@@ -40,4 +40,9 @@ package pipeline_reg_pkg;
     gp_reg_t alu_result;
   } exe_mem_reg_t;
 
+  typedef struct packed {
+    exe_mem_reg_t exe_mem_reg;
+    word_t r_data;
+  } mem_wb_reg_t;
+
 endpackage
