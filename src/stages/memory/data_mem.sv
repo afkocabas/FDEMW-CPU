@@ -1,8 +1,9 @@
+import fdemw_pkg::*;
+
 module data_mem (
     input logic clk_i,
-    input logic res_i,
 
-    dmem_if.dmem lsu_if
+    dmem_if.dmem dmem
 );
 
   (* ram_style = "block" *)
@@ -18,8 +19,18 @@ module data_mem (
   *
   */
   always_ff @(posedge clk_i) begin : seq_block
-    lsu_if.data <= mem[lsu_if.data_addr.fields.word_idx];
-    lsu_if.resp_valid <= lsu_if.req_valid;
+    if (!dmem.req_valid) begin
+      dmem.resp_valid <= LOW;
+      dmem.r_data <= '0;
+    end else begin
+      if (dmem.wr_en) begin
+        mem[dmem.m_addr] <= dmem.wr_data;
+        dmem.resp_valid  <= LOW;
+      end else if (dmem.r_en) begin
+        dmem.r_data <= mem[dmem.m_addr];
+        dmem.resp_valid <= HIGH;
+      end
+    end
   end
 
 endmodule
