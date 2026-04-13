@@ -36,6 +36,7 @@ module memory (
 
   always_comb begin : output_comb
     mem_wb_reg_o.r_data = '0;
+    mem_wb_reg_o.exe_mem_reg = '0;
 
     dmem_if.r_en = LOW;
     dmem_if.req_valid = LOW;
@@ -47,29 +48,37 @@ module memory (
 
     unique case (state_q)
       IDLE: begin
-        if (r_en && i_reg_valid) begin
-          dmem_if.r_en = HIGH;
-          dmem_if.req_valid = HIGH;
+        if (i_reg_valid) begin
+          if (r_en) begin
+            dmem_if.r_en = HIGH;
+            dmem_if.req_valid = HIGH;
 
-          state_d = WAIT_RESP;
-        end else if (wr_en && i_reg_valid) begin
-          dmem_if.wr_en = HIGH;
-          dmem_if.req_valid = HIGH;
+            state_d = WAIT_RESP;
+          end else if (wr_en) begin
+            dmem_if.wr_en = HIGH;
+            dmem_if.req_valid = HIGH;
 
+          end else begin
+            mem_wb_reg_o.exe_mem_reg = exe_mem_reg_i;
+          end
         end
       end
       WAIT_RESP: begin
         dmem_if.req_valid = HIGH;
         if (dmem_if.resp_valid) begin
+
+          // Latch the result
           mem_wb_reg_o.r_data = dmem_if.r_data;
+          mem_wb_reg_o.exe_mem_reg = exe_mem_reg_i;
+
           if (!i_reg_valid) begin
             state_d = IDLE;
           end else begin
-            if (r_en && i_reg_valid) begin
+            if (r_en) begin
               dmem_if.req_valid = HIGH;
               dmem_if.r_en = HIGH;
 
-            end else if (wr_en && i_reg_valid) begin
+            end else if (wr_en) begin
               dmem_if.wr_en = HIGH;
               dmem_if.req_valid = HIGH;
             end
