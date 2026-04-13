@@ -22,17 +22,12 @@ module fetch (
   /* State Registers and Next State Signals*/
   f_state_t state_q, state_d;
   addr_t prg_cnt_q, prg_cnt_d;
-  logic [26:0] cnt_q, cnt_d;  // Clock divider
 
   /* Internal signals */
   if_id_reg_t if_id_o_c;
-  logic is_cnt_done;
   logic req_valid_c;
   addr_t inst_addr_c;
 
-  always_comb begin : derived_macros
-    is_cnt_done = (cnt_q == '1);
-  end
 
   always_comb begin : fsm_block
     // Default state register assingments
@@ -62,7 +57,7 @@ module fetch (
         end
         WAIT_RESP: begin
           req_valid_c = HIGH;
-          if (imem_if.resp_valid && is_cnt_done) begin
+          if (imem_if.resp_valid) begin
             if (!stall_i) begin
               prg_cnt_d = prg_cnt_q + 4;
 
@@ -87,27 +82,14 @@ module fetch (
     end
   end
 
-  always_comb begin : comb_block
-    cnt_d = cnt_q;
-    if (is_cnt_done) begin
-      cnt_d = '0;
-    end else begin
-      cnt_d = cnt_q + 1;
-    end
-  end
 
-
-  always_ff @(posedge clk_i) begin : seq_block
+  always_ff @(posedge clk_i or posedge res_i) begin : seq_block
     if (res_i) begin
-      cnt_q <= '0;
       prg_cnt_q <= '0;
-      state_q <= IDLE;
+      state_q   <= IDLE;
     end else begin
-      cnt_q <= cnt_d;
-      if (is_cnt_done) begin
-        prg_cnt_q <= prg_cnt_d;
-        state_q   <= state_d;
-      end
+      prg_cnt_q <= prg_cnt_d;
+      state_q   <= state_d;
     end
 
   end
