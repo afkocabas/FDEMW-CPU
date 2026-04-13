@@ -229,6 +229,33 @@ module decode (
         illegal_inst_o = !valid_o;
 
       end
+      J_T: begin
+        imm_o = {
+          {11{inst.j.imm_20}}, inst.j.imm_20, inst.j.imm_19_12, inst.j.imm_11, inst.j.imm_10_1, 1'b0
+        };
+        rd_idx_o = inst.j.rd;
+        alu_op_o = ADD;
+        pc_o = pc;
+        alu_src1_o = SRC1_PC;
+        alu_src2_o = SRC2_IMM;
+        wb_sel_o = WB_PC4;
+        branch_type_o = BR_NONE;
+
+        valid_o = HIGH;
+        illegal_inst_o = LOW;
+        uses_rs1_o = LOW;
+        uses_rs2_o = LOW;
+        is_reg_write_o = HIGH;
+        is_mem_read_o = LOW;
+        is_mem_write_o = LOW;
+        is_branch_o = HIGH;
+        is_jal_o = HIGH;
+        is_jalr_o = LOW;
+
+        rs1_idx_o = '0;
+        rs2_idx_o = '0;
+
+      end
     endcase
   end
 
