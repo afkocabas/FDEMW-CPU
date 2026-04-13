@@ -8,3 +8,4 @@ verible.filelist
 obj_dir
 peakrdl-env
 fdemw_cpu_project
+fdemw_tb_project
