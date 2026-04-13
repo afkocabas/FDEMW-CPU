@@ -131,12 +131,11 @@ module fdemw_top (
 
   // ---------------- Register File ----------------
 
-  // TODO: Handle these placeholders
   logic gp_reg_r_en_1 = HIGH;
   logic gp_reg_r_en_2 = HIGH;
-  logic gp_reg_wr_en = LOW;
-  reg_idx_t gp_wr_idx = '0;
-  gp_reg_t gp_wr_data = '0;
+  logic gp_wr_en;
+  reg_idx_t gp_wr_idx;
+  gp_reg_t gp_wr_data;
 
   gp_reg_file reg_file (
       .clk_i(clk_i),
@@ -148,7 +147,7 @@ module fdemw_top (
       .r_en_2_i (gp_reg_r_en_2),
       .r_idx_2_i(decode_rs2_idx_o),
 
-      .wr_en_i  (gp_reg_wr_en),
+      .wr_en_i  (gp_wr_en),
       .wr_idx_i (gp_wr_idx),
       .wr_data_i(gp_wr_data),
 
@@ -176,6 +175,18 @@ module fdemw_top (
       .mem_wb_reg_o(mem_wb_o),
 
       .dmem_if(dmem_iff.core)
+  );
+
+  // ------------- Write Back --------------------
+
+  write_back wb (
+
+      .mem_wb_reg_i(mem_wb_reg_q),
+
+      .wr_en_o  (gp_wr_en),
+      .wr_data_o(gp_wr_data),
+      .rd_idx_o (gp_wr_idx)
+
   );
 
   // ------------- Instruction Memory --------------------
