@@ -11,14 +11,35 @@ import riscv32i_pkg::*;
 
 interface dmem_if;
 
+  logic  wr_en;
+  logic  r_en;
+
+  word_t wr_data;
+  word_t r_data;
+
+  addr_t m_addr;
+
   logic  req_valid;
   logic  resp_valid;
 
-  addr_t data_addr;
-  word_t word;
+  modport core(
+      input resp_valid,
+      input r_data,
+      output req_valid,
+      output m_addr,
+      output wr_en,
+      output r_en,
+      output wr_data
+  );
 
-  modport lsu(input resp_valid, input word, output data_addr, output req_valid);
-
-  modport dmem(input data_addr, input req_valid, output resp_valid, output data);
+  modport dmem(
+      input req_valid,
+      input m_addr,
+      input wr_en,
+      input r_en,
+      input wr_data,
+      output resp_valid,
+      output r_data
+  );
 
 endinterface
