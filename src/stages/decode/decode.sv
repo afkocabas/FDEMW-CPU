@@ -35,8 +35,14 @@ module decode (
 );
 
   // Internal signals
-  inst_t inst = if_id_reg_i.inst;
-  addr_t pc = if_id_reg_i.pc;
+
+  inst_t inst;
+  addr_t pc;
+
+  always_comb begin : blockName
+    inst = if_id_reg_i.inst;
+    pc   = if_id_reg_i.pc;
+  end
 
   inst_kind_e inst_kind = get_inst_kind(inst);
 
