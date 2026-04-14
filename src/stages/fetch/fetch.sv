@@ -40,7 +40,11 @@ module fetch (
     req_valid_c = LOW;
 
     // Flush has should should be immediate.
-    if (flush_i) begin
+    if (res_i) begin
+      if_id_o_c   = '0;
+      inst_addr_c = '0;
+      req_valid_c = LOW;
+    end else if (flush_i) begin
       req_valid_c = LOW;
       if_id_o_c = '0;
 
@@ -60,6 +64,7 @@ module fetch (
           if (imem_if.resp_valid) begin
             if (!stall_i) begin
               prg_cnt_d = prg_cnt_q + 4;
+              inst_addr_c = prg_cnt_d;
 
               if_id_o_c.inst = imem_if.inst;
               if_id_o_c.pc = prg_cnt_q;
