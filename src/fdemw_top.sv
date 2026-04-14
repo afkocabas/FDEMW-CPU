@@ -67,6 +67,7 @@ module fdemw_top (
 
   // ------------- Decode --------------------
   localparam id_exe_reg_t ID_EXE_REG_RESET = '{
+      inst  : '0,
       inst_format  : INST_INVALID,  // replace with your real default enum
       imm          : '0,
       rd_idx       : reg_idx_t'('0),  // or a named enum/member if reg_idx_t is enum
@@ -102,6 +103,7 @@ module fdemw_top (
 
       .if_id_reg_i(if_id_reg_q),
 
+      .inst_o(id_exe_o.inst),
       .inst_format_o(id_exe_o.inst_format),
       .imm_o(id_exe_o.imm),
       .rd_idx_o(id_exe_o.rd_idx),

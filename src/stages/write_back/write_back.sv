@@ -16,6 +16,7 @@ module write_back (
   reg_idx_t rd_idx;
   gp_reg_t alu_result;
   word_t mem_data;
+  inst_t inst;
 
   always_comb begin : assign_block
     pc = mem_wb_reg_i.exe_mem_reg.id_exe_reg.pc;
@@ -23,6 +24,7 @@ module write_back (
     rd_idx = mem_wb_reg_i.exe_mem_reg.id_exe_reg.rd_idx;
     alu_result = mem_wb_reg_i.exe_mem_reg.alu_result;
     mem_data = mem_wb_reg_i.r_data;
+    inst = mem_wb_reg_i.exe_mem_reg.id_exe_reg.inst;
   end
 
 
