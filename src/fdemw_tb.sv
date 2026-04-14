@@ -33,10 +33,10 @@ module fdemw_tb;
 
   initial begin
     res = 1;
-    #15;
+    #20;
     res = 0;
 
-    #1000;
+    #300;
     $finish;
   end
 
