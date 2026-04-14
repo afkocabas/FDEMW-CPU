@@ -6,6 +6,7 @@ module decode (
     input if_id_reg_t if_id_reg_i,
 
     // To ID/EXE
+    output inst_t inst_o,
     output inst_format_e inst_format_o,
     output imm_t imm_o,
     output reg_idx_t rd_idx_o,
@@ -38,16 +39,17 @@ module decode (
 
   inst_t inst;
   addr_t pc;
+  inst_kind_e inst_kind;
 
   always_comb begin : blockName
     inst = if_id_reg_i.inst;
     pc   = if_id_reg_i.pc;
   end
 
-  inst_kind_e inst_kind = get_inst_kind(inst);
-
   always_comb begin : output_comb
     inst_format_o = get_inst_format(inst);
+    inst_kind = get_inst_kind(inst);
+    inst_o = inst;
 
     imm_o = '0;
     rd_idx_o = inst.r.rd;

@@ -7,6 +7,12 @@ module execute (
   gp_reg_t op_b;
   gp_reg_t alu_result;
 
+  addr_t   pc_i;
+
+  always_comb begin : debug_block  // WARN: Debug.
+    pc_i = id_exe_reg_i.pc;
+  end
+
   always_comb begin : alu_op_comb
     op_a = '0;
     op_b = '0;
