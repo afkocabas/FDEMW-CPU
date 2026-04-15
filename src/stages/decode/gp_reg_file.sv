@@ -5,10 +5,10 @@ module gp_reg_file (
     input logic res_i,
 
     // Read ports (2)
-    input logic   r_en_1_i,
+    input logic r_en_1_i,
     input reg_idx_t r_idx_1_i,
 
-    input logic   r_en_2_i,
+    input logic r_en_2_i,
     input reg_idx_t r_idx_2_i,
 
     // Write ports (1)
@@ -20,6 +20,14 @@ module gp_reg_file (
     output gp_reg_t r_data_2_o
 );
   reg_file_t reg_file_q, reg_file_d;
+
+  genvar i;
+  generate
+    for (i = 0; i < 32; i++) begin : gen_dbg_regs
+      logic [31:0] dbg_reg;
+      assign dbg_reg = reg_file_q[i];
+    end
+  endgenerate
 
   always_comb begin : comb_block
     reg_file_d = reg_file_q;
