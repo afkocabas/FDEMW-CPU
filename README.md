@@ -1,3 +1,3 @@
-# FDEMW-CPU
+# RISC-V-32I FDEMW-CPU
 
-An attempt to build a five-stage(fetch, decode, execute, memory, write back) CPU with RISC-V-32I ISA.
+An attempt to build a five-stage in-order RISC-V-32I CPU.
