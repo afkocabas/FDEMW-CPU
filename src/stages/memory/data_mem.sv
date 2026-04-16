@@ -10,7 +10,9 @@ module data_mem (
   logic [WORD_WIDTH - 1:0] mem[MEM_WORDS];
 
   initial begin
-    $readmemh("r_type.mem", mem);
+    for (int i = 0; i < MEM_WORDS; i++) begin
+      mem[i] = 32'b0;
+    end
   end
 
   /*
@@ -25,7 +27,7 @@ module data_mem (
     end else begin
       if (dmem.wr_en) begin
         mem[dmem.m_addr] <= dmem.wr_data;
-        dmem.resp_valid  <= LOW;
+        dmem.resp_valid  <= HIGH;
       end else if (dmem.r_en) begin
         dmem.r_data <= mem[dmem.m_addr];
         dmem.resp_valid <= HIGH;
