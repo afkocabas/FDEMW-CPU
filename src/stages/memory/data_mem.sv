@@ -27,7 +27,7 @@ module data_mem (
     end else begin
       if (dmem.wr_en) begin
         mem[dmem.m_addr] <= dmem.wr_data;
-        dmem.resp_valid  <= HIGH;
+        dmem.resp_valid  <= LOW;
       end else if (dmem.r_en) begin
         dmem.r_data <= mem[dmem.m_addr];
         dmem.resp_valid <= HIGH;
