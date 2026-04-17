@@ -66,32 +66,6 @@ module fdemw_top (
   );
 
   // ------------- Decode --------------------
-  localparam id_exe_reg_t ID_EXE_REG_RESET = '{
-      inst  : '0,
-      inst_format  : INST_INVALID,  // replace with your real default enum
-      imm          : '0,
-      rd_idx       : reg_idx_t'('0),  // or a named enum/member if reg_idx_t is enum
-      alu_op       : ALU_NONE,  // replace with your real default enum
-      pc           : '0,
-      alu_src1     : SRC1_RS1,  // or your safe default
-      alu_src2     : SRC2_RS2,  // or your safe default
-      wb_sel       : WB_ALU,  // or your safe default
-      branch_type  : BR_NONE,
-
-      valid        : 1'b0,
-      illegal_inst : 1'b0,
-      uses_rs1     : 1'b0,
-      uses_rs2     : 1'b0,
-      is_reg_write : 1'b0,
-      is_mem_read  : 1'b0,
-      is_mem_write : 1'b0,
-      is_branch    : 1'b0,
-      is_jal       : 1'b0,
-      is_jalr      : 1'b0,
-
-      rs1_data     : '0,
-      rs2_data     : '0
-  };
 
   id_exe_reg_t id_exe_o;
 
@@ -168,6 +142,7 @@ module fdemw_top (
   // ------------- Memory --------------------
 
   mem_wb_reg_t mem_wb_o;
+  logic mem_stall;
   memory memory_core (
 
       .clk_i(clk_i),
@@ -175,6 +150,7 @@ module fdemw_top (
       .exe_mem_reg_i(exe_mem_reg_q),
 
       .mem_wb_reg_o(mem_wb_o),
+      .mem_stall_o (mem_stall),
 
       .dmem_if(dmem_iff.core)
   );
@@ -218,7 +194,7 @@ module fdemw_top (
       id_exe_reg_d  = '0;
       exe_mem_reg_d = '0;
       mem_wb_reg_d  = '0;
-    end else if (stall_i) begin
+    end else if (mem_stall || stall_i) begin
       if_id_reg_d   = if_id_reg_q;
       id_exe_reg_d  = id_exe_reg_q;
       exe_mem_reg_d = exe_mem_reg_q;
@@ -234,7 +210,7 @@ module fdemw_top (
   always_ff @(posedge clk_i or posedge res_i) begin : top_seq
     if (res_i) begin
       if_id_reg_q   <= '0;
-      id_exe_reg_q  <= ID_EXE_REG_RESET;
+      id_exe_reg_q  <= '0;
       exe_mem_reg_q <= '0;
       mem_wb_reg_q  <= '0;
     end else begin

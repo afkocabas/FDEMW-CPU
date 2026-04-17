@@ -8,11 +8,12 @@ module memory (
     input exe_mem_reg_t exe_mem_reg_i,
 
     output mem_wb_reg_t mem_wb_reg_o,
+    output logic mem_stall_o,
 
     dmem_if.core dmem_if
 );
 
-  typedef enum {
+  typedef enum logic {
     IDLE,
     WAIT_RESP
   } state_t;
@@ -25,18 +26,22 @@ module memory (
   logic  i_reg_valid;
   addr_t m_addr;
   word_t wr_data;
+  inst_t inst;
 
   always_comb begin
+    inst = exe_mem_reg_i.id_exe_reg.inst;
     r_en = exe_mem_reg_i.id_exe_reg.is_mem_read;
     wr_en = exe_mem_reg_i.id_exe_reg.is_mem_write;
-    m_addr = exe_mem_reg_i.alu_result;
+    m_addr = (r_en || wr_en) ? exe_mem_reg_i.alu_result : '0;
     wr_data = exe_mem_reg_i.id_exe_reg.rs2_data;
     i_reg_valid = exe_mem_reg_i.id_exe_reg.valid;
   end
 
   always_comb begin : output_comb
+
     mem_wb_reg_o.r_data = '0;
     mem_wb_reg_o.exe_mem_reg = '0;
+    mem_stall_o = LOW;
 
     dmem_if.r_en = LOW;
     dmem_if.req_valid = LOW;
@@ -54,10 +59,12 @@ module memory (
             dmem_if.req_valid = HIGH;
 
             state_d = WAIT_RESP;
+            mem_stall_o = HIGH;
           end else if (wr_en) begin
             dmem_if.wr_en = HIGH;
             dmem_if.req_valid = HIGH;
 
+            mem_wb_reg_o.exe_mem_reg = exe_mem_reg_i;
           end else begin
             mem_wb_reg_o.exe_mem_reg = exe_mem_reg_i;
           end
@@ -70,19 +77,9 @@ module memory (
           // Latch the result
           mem_wb_reg_o.r_data = dmem_if.r_data;
           mem_wb_reg_o.exe_mem_reg = exe_mem_reg_i;
+          mem_stall_o = LOW;
 
-          if (!i_reg_valid) begin
-            state_d = IDLE;
-          end else begin
-            if (r_en) begin
-              dmem_if.req_valid = HIGH;
-              dmem_if.r_en = HIGH;
-
-            end else if (wr_en) begin
-              dmem_if.wr_en = HIGH;
-              dmem_if.req_valid = HIGH;
-            end
-          end
+          state_d = IDLE;
         end
       end
     endcase
