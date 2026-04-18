@@ -7,21 +7,15 @@ module fdemw_tb;
   logic stall = 0;
   logic flush = 0;
 
-  seg_t seg;
-  logic [3:0] an;
-
   // Instantiate DUT
   fdemw_top dut (
       .clk_i(clk),
       .res_i(res),
 
       .stall_i(stall),
-      .flush_i(flush),
+      .flush_i(flush)
 
-      .seg_o(seg),
-      .an_o (an)
   );
-
 
   initial begin
     $dumpfile("fdemw_tb.vcd");

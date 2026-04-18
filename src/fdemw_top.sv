@@ -8,14 +8,9 @@ module fdemw_top (
 
 
     input logic stall_i,
-    input logic flush_i,
+    input logic flush_i
 
-    output seg_t seg_o,
-    output logic [3:0] an_o
 );
-
-  // Internal signals (wires of other modules)
-  inst_format_e dec_inst_kind;
 
   // Pipeline registers
   if_id_reg_t if_id_reg_q, if_id_reg_d;
@@ -27,35 +22,10 @@ module fdemw_top (
   imem_if imem_iff ();
   dmem_if dmem_iff ();
 
-  // Internal signals
-  logic [3:0] an_o_c;
-  seg_t seg_o_c;
-
-  always_comb begin : assign_comb
-    an_o_c = 4'b1110;
-  end
-
-  always_comb begin : seg_comb
-    unique case (exe_mem_reg_q.id_exe_reg.rd_idx)
-      4'd0: seg_o_c = 7'b1000000;  // 0
-      4'd1: seg_o_c = 7'b1111001;  // 1
-      4'd2: seg_o_c = 7'b0100100;  // 2
-      4'd3: seg_o_c = 7'b0110000;  // 3
-      4'd4: seg_o_c = 7'b0011001;  // 4
-      4'd5: seg_o_c = 7'b0010010;  // 5
-      4'd6: seg_o_c = 7'b0000010;  // 6
-      4'd7: seg_o_c = 7'b1111000;  // 7
-      4'd8: seg_o_c = 7'b0000000;  // 8
-      4'd9: seg_o_c = 7'b0010000;  // 9
-      4'd10: seg_o_c = 7'b0001000;  // A (10)
-      default: seg_o_c = 7'b0111111;
-    endcase
-  end
-
   // ------------- Fetch --------------------
   if_id_reg_t if_id_o;
 
-  fetch fetch_core (
+  fetch_2 fetch_core (
       .clk_i  (clk_i),
       .res_i  (res_i),
       .stall_i(stall_i),
@@ -221,6 +191,4 @@ module fdemw_top (
     end
   end
 
-  assign an_o  = an_o_c;
-  assign seg_o = seg_o_c;
 endmodule
