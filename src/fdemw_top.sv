@@ -69,9 +69,8 @@ module fdemw_top (
       .is_jal_o(id_exe_o.is_jal),
       .is_jalr_o(id_exe_o.is_jalr),
 
-
-      .rs1_idx_o(decode_rs1_idx_o),
-      .rs2_idx_o(decode_rs2_idx_o)
+      .rs1_idx_o(id_exe_o.rs1_idx),
+      .rs2_idx_o(id_exe_o.rs2_idx)
 
   );
 
@@ -88,10 +87,10 @@ module fdemw_top (
       .res_i(res_i),
 
       .r_en_1_i (gp_reg_r_en_1),
-      .r_idx_1_i(decode_rs1_idx_o),
+      .r_idx_1_i(id_exe_o.rs1_idx),
 
       .r_en_2_i (gp_reg_r_en_2),
-      .r_idx_2_i(decode_rs2_idx_o),
+      .r_idx_2_i(id_exe_o.rs2_idx),
 
       .wr_en_i  (gp_wr_en),
       .wr_idx_i (gp_wr_idx),
@@ -104,9 +103,31 @@ module fdemw_top (
   // ------------- Execute --------------------
 
   exe_mem_reg_t exe_mem_o;
+
+  forward_sel_t forward_sel_a;
+  forward_sel_t forward_sel_b;
+
+  gp_reg_t mem_forward_op;
+  gp_reg_t exe_forward_op;
+
+  always_comb begin : execute_block
+    // WARNING: Forwarding from memory should be either data or alu results depending
+    // on the instruction. For now, it assumes the latter one in the following
+    // line.
+    // TODO: Add memory data forwarding.
+    mem_forward_op = mem_wb_reg_q.exe_mem_reg.alu_result;
+    exe_forward_op = exe_mem_reg_q.alu_result;
+  end
+
   execute execute_core (
       .id_exe_reg_i (id_exe_reg_q),
-      .exe_mem_reg_o(exe_mem_o)
+      .exe_mem_reg_o(exe_mem_o),
+
+      .forward_sel_a_i(forward_sel_a),
+      .forward_sel_b_i(forward_sel_b),
+
+      .mem_forward_op_i(mem_forward_op),
+      .exe_forward_op_i(exe_forward_op)
   );
 
   // ------------- Memory --------------------
@@ -151,6 +172,45 @@ module fdemw_top (
       .clk_i(clk_i),
 
       .dmem(dmem_iff.dmem)
+  );
+
+  // ------------- Hazard Unit --------------------
+
+  reg_idx_t rs1;
+  reg_idx_t rs2;
+  logic uses_rs1;
+  logic uses_rs2;
+  reg_idx_t exe_rd;
+  reg_idx_t mem_rd;
+  logic exe_write_reg;
+  logic mem_write_reg;
+
+  always_comb begin : hazard_i
+    rs1 = id_exe_reg_q.rs1_idx;
+    rs2 = id_exe_reg_q.rs2_idx;
+
+    uses_rs1 = id_exe_reg_q.uses_rs1;
+    uses_rs2 = id_exe_reg_q.uses_rs2;
+
+    exe_rd = exe_mem_reg_q.id_exe_reg.rd_idx;
+    mem_rd = mem_wb_reg_q.exe_mem_reg.id_exe_reg.rd_idx;
+
+    exe_write_reg = exe_mem_reg_q.id_exe_reg.is_reg_write;
+    mem_write_reg = mem_wb_reg_q.exe_mem_reg.id_exe_reg.is_reg_write;
+  end
+
+  hazard_unit hazard_unit (
+      .rs1_i(rs1),
+      .rs2_i(rs2),
+      .uses_rs1_i(uses_rs1),
+      .uses_rs2_i(uses_rs2),
+      .exe_rd_i(exe_rd),
+      .mem_rd_i(mem_rd),
+      .exe_write_reg_i(exe_write_reg),
+      .mem_write_reg_i(mem_write_reg),
+
+      .forward_sel_a_o(forward_sel_a),
+      .forward_sel_b_o(forward_sel_b)
   );
 
   always_comb begin

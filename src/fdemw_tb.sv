@@ -30,7 +30,7 @@ module fdemw_tb;
     #15;
     res = 0;
 
-    #300;
+    #1000;
     $finish;
   end
 

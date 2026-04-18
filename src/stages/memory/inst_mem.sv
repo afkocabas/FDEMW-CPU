@@ -10,7 +10,7 @@ module inst_mem (
   logic [WORD_WIDTH - 1:0] mem[MEM_WORDS];
 
   initial begin
-    $readmemh("sw_lw.mem", mem);
+    $readmemh("data_hazard.mem", mem);
   end
 
   always_ff @(posedge clk_i) begin : seq_block

@@ -23,30 +23,24 @@ module fetch (
   f_state_t state_q, state_d;
   addr_t prg_cnt_q, prg_cnt_d;
 
-  /* Internal signals */
-  if_id_reg_t if_id_o_c;
-  logic req_valid_c;
-  addr_t inst_addr_c;
-
-
   always_comb begin : fsm_block
     // Default state register assingments
     state_d = state_q;
     prg_cnt_d = prg_cnt_q;
-    if_id_o_c = '0;
+    if_id_o = '0;
 
     // Default output signal assignments
-    inst_addr_c = prg_cnt_q;
-    req_valid_c = LOW;
+    imem_if.inst_addr = prg_cnt_q;
+    imem_if.req_valid = LOW;
 
     // Flush has should should be immediate.
     if (res_i) begin
-      if_id_o_c   = '0;
-      inst_addr_c = '0;
-      req_valid_c = LOW;
+      if_id_o = '0;
+      imem_if.inst_addr = '0;
+      imem_if.req_valid = LOW;
     end else if (flush_i) begin
-      req_valid_c = LOW;
-      if_id_o_c = '0;
+      imem_if.req_valid = LOW;
+      if_id_o = '0;
 
       prg_cnt_d = flush_addr_i;
       state_d = IDLE;
@@ -54,28 +48,22 @@ module fetch (
       unique case (state_q)
         IDLE: begin
           if (!stall_i) begin
-            req_valid_c = HIGH;
-            inst_addr_c = prg_cnt_q;
+            imem_if.req_valid = HIGH;
+            imem_if.inst_addr = prg_cnt_q;
             state_d = WAIT_RESP;
           end
         end
         WAIT_RESP: begin
-          req_valid_c = HIGH;
+          imem_if.req_valid = HIGH;
           if (imem_if.resp_valid) begin
             if (!stall_i) begin
+              // TODO: PC is not always PC + 4
               prg_cnt_d = prg_cnt_q + 4;
-              inst_addr_c = prg_cnt_d;
+              imem_if.inst_addr = prg_cnt_d;
 
-              if_id_o_c.inst = imem_if.inst;
-              if_id_o_c.pc = prg_cnt_q;
-              if_id_o_c.valid = HIGH;
-
-              // WARN: The following line incurs a bubble in the pipeline.
-              // The reason is the following:
-              // After state transition, IDLE does not check memory response in the same cycle, it only issues the transition to WAIT_RESP.
-              // Only after then, memory repsonse is checked.
-
-              // state_d = IDLE;
+              if_id_o.inst = imem_if.inst;
+              if_id_o.pc = prg_cnt_q;
+              if_id_o.valid = HIGH;
 
             end else begin
               // TODO: If the memory responds but there is stall, buffer the
@@ -98,10 +86,5 @@ module fetch (
     end
 
   end
-
-
-  assign imem_if.req_valid = req_valid_c;
-  assign imem_if.inst_addr = inst_addr_c;
-  assign if_id_o = if_id_o_c;
 
 endmodule
