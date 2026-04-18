@@ -13,6 +13,8 @@ package pipeline_reg_pkg;
     inst_format_e inst_format;
     imm_t imm;
     reg_idx_t rd_idx;
+    reg_idx_t rs1_idx;
+    reg_idx_t rs2_idx;
     alu_op_t alu_op;
     addr_t pc;
     alu_src1_t alu_src1;
