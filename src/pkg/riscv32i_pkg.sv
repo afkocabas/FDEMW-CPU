@@ -150,6 +150,12 @@ package riscv32i_pkg;
     BR_BGEU
   } branch_type_t;
 
+  typedef enum logic [1:0] {
+    NO_FORWARD,
+    FORWARD_FROM_EXE,
+    FORWARD_FROM_MEM
+  } forward_sel_t;
+
   function automatic inst_format_e get_inst_format(inst_t inst);
     logic [6:0] opcode;
     opcode = inst[6:0];
