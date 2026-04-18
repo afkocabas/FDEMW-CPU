@@ -21,7 +21,7 @@ package fdemw_pkg;
   parameter int GP_REG_WIDTH = WORD_WIDTH;
   parameter int GP_REG_BYTES = GP_REG_WIDTH / BYTE_WIDTH;
 
-  parameter int REG_FILE_DEPTH = 16;
+  parameter int REG_FILE_DEPTH = 32;
   parameter int REG_FILE_IDX_NBITS = $clog2(REG_FILE_DEPTH);
 
   // Adresss ________ __ -> If multiple of 4, it points to a word. A word is
