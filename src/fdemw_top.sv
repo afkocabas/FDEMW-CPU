@@ -111,10 +111,6 @@ module fdemw_top (
   gp_reg_t exe_forward_op;
 
   always_comb begin : execute_block
-    // WARNING: Forwarding from memory should be either data or alu results depending
-    // on the instruction. For now, it assumes the latter one in the following
-    // line.
-    // TODO: Add memory data forwarding.
     mem_forward_op = gp_wr_data;
     exe_forward_op = exe_mem_reg_q.alu_result;
   end
