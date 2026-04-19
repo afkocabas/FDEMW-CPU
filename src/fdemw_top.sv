@@ -115,7 +115,7 @@ module fdemw_top (
     // on the instruction. For now, it assumes the latter one in the following
     // line.
     // TODO: Add memory data forwarding.
-    mem_forward_op = mem_wb_reg_q.exe_mem_reg.alu_result;
+    mem_forward_op = gp_wr_data;
     exe_forward_op = exe_mem_reg_q.alu_result;
   end
 
