@@ -1,7 +1,7 @@
 import fdemw_pkg::*;
 import riscv32i_pkg::*;
 
-module hazard_unit (
+module forward_unit (
 
     // Decode/Execute source registers
     input reg_idx_t rs1_i,

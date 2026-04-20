@@ -4,7 +4,6 @@ module fdemw_tb;
 
   logic clk;
   logic res;
-  logic stall = 0;
   logic flush = 0;
 
   // Instantiate DUT
@@ -12,7 +11,6 @@ module fdemw_tb;
       .clk_i(clk),
       .res_i(res),
 
-      .stall_i(stall),
       .flush_i(flush)
 
   );
