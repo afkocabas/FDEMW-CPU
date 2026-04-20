@@ -7,8 +7,8 @@ module fetch_2 (
 
     input logic stall_i,
 
-    input logic  flush_i,
-    input addr_t flush_pc_i,
+    input logic  redirect_i,
+    input addr_t redirect_pc_i,
 
     output if_id_reg_t if_id_o,
     imem_if.fetch imem_if
@@ -35,8 +35,8 @@ module fetch_2 (
     if (res_i) begin
       imem_if.inst_addr = '0;
       imem_if.req_valid = LOW;
-    end else if (flush_i) begin
-      pc_d = flush_pc_i;
+    end else if (redirect_i) begin
+      pc_d = redirect_pc_i;
       drop_req_d = HIGH;
     end else if (stall_i) begin
       if (req_flight_q) begin
@@ -62,7 +62,7 @@ module fetch_2 (
     end
   end
 
-  always_ff @(posedge clk_i) begin : blockName
+  always_ff @(posedge clk_i or posedge res_i) begin : blockName
     if (res_i) begin
       pc_req_q <= '0;
       pc_q <= '0;
