@@ -6,8 +6,6 @@ module fdemw_top (
     input logic clk_i,
     input logic res_i,
 
-
-    input logic stall_i,
     input logic flush_i
 
 );
@@ -26,9 +24,9 @@ module fdemw_top (
   if_id_reg_t if_id_o;
 
   fetch_2 fetch_core (
-      .clk_i  (clk_i),
-      .res_i  (res_i),
-      .stall_i(stall_i),
+      .clk_i(clk_i),
+      .res_i(res_i),
+      // .stall_i(stall_i),
 
       .imem_if(imem_iff.fetch),
 
@@ -170,7 +168,7 @@ module fdemw_top (
       .dmem(dmem_iff.dmem)
   );
 
-  // ------------- Hazard Unit --------------------
+  // ------------- Forward Unit --------------------
 
   reg_idx_t rs1;
   reg_idx_t rs2;
@@ -181,7 +179,7 @@ module fdemw_top (
   logic exe_write_reg;
   logic mem_write_reg;
 
-  always_comb begin : hazard_i
+  always_comb begin : forward_i
     rs1 = id_exe_reg_q.rs1_idx;
     rs2 = id_exe_reg_q.rs2_idx;
 
@@ -195,7 +193,7 @@ module fdemw_top (
     mem_write_reg = mem_wb_reg_q.exe_mem_reg.id_exe_reg.is_reg_write;
   end
 
-  hazard_unit hazard_unit (
+  forward_unit forward_unit (
       .rs1_i(rs1),
       .rs2_i(rs2),
       .uses_rs1_i(uses_rs1),
@@ -220,7 +218,7 @@ module fdemw_top (
       id_exe_reg_d  = '0;
       exe_mem_reg_d = '0;
       mem_wb_reg_d  = '0;
-    end else if (mem_stall || stall_i) begin
+    end else if (mem_stall) begin
       if_id_reg_d   = if_id_reg_q;
       id_exe_reg_d  = id_exe_reg_q;
       exe_mem_reg_d = exe_mem_reg_q;
