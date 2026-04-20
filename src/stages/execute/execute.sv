@@ -52,14 +52,12 @@ module execute (
     exe_mem_reg_o.id_exe_reg = id_exe_reg_i;
 
     if (forward_sel_a_i == FORWARD_FROM_EXE) exe_mem_reg_o.id_exe_reg.rs1_data = exe_forward_op_i;
-    else
-    if (forward_sel_a_i == FORWARD_FROM_MEM);
-    else exe_mem_reg_o.id_exe_reg.rs1_data = mem_forward_op_i;
+    else if (forward_sel_a_i == FORWARD_FROM_MEM);
+    exe_mem_reg_o.id_exe_reg.rs1_data = mem_forward_op_i;
 
     if (forward_sel_b_i == FORWARD_FROM_EXE) exe_mem_reg_o.id_exe_reg.rs2_data = exe_forward_op_i;
-    else
-    if (forward_sel_b_i == FORWARD_FROM_MEM);
-    else exe_mem_reg_o.id_exe_reg.rs2_data = mem_forward_op_i;
+    else if (forward_sel_b_i == FORWARD_FROM_MEM);
+    exe_mem_reg_o.id_exe_reg.rs2_data = mem_forward_op_i;
 
     exe_mem_reg_o.alu_result = alu_result;
   end
