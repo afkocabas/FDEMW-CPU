@@ -7,8 +7,10 @@ module control_unit (
 
 );
 
-  // TODO: Complete the logic here
-  always_comb begin : output_comb
+  // TODO: Complete the logic here.
+  // WARNING: Unit it is not completed.
 
+  always_comb begin : output_comb
+    pipeline_stall_o = memory_stall_i;
   end
 endmodule
