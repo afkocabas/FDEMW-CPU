@@ -207,6 +207,22 @@ module fdemw_top (
       .forward_sel_b_o(forward_sel_b)
   );
 
+  // ------------- Control Unit --------------------
+
+  logic pipeline_stall;
+  logic flush_frontend;
+
+  control_unit control_unit (
+      .memory_stall_i(mem_stall),
+
+      // TODO: Add branch logic
+      // input logic branch_taken_i,
+
+      .pipeline_stall_o(pipeline_stall),
+      .flush_frontend_o(flush_frontend)
+
+  );
+
   always_comb begin
     if_id_reg_d   = if_id_reg_q;
     id_exe_reg_d  = id_exe_reg_q;
@@ -218,7 +234,7 @@ module fdemw_top (
       id_exe_reg_d  = '0;
       exe_mem_reg_d = '0;
       mem_wb_reg_d  = '0;
-    end else if (mem_stall) begin
+    end else if (pipeline_stall) begin
       if_id_reg_d   = if_id_reg_q;
       id_exe_reg_d  = id_exe_reg_q;
       exe_mem_reg_d = exe_mem_reg_q;
