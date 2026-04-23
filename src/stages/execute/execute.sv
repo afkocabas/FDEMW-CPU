@@ -8,7 +8,6 @@ module execute (
     input gp_reg_t mem_forward_op_i,
     input gp_reg_t exe_forward_op_i,
 
-    output logic  is_jump_o,
     output logic  branch_taken_o,
     output addr_t redirect_addr_o
 
@@ -19,9 +18,10 @@ module execute (
   gp_reg_t alu_result;
 
   always_comb begin : signal_o_comb
-    is_jump_o = id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr;
     redirect_addr_o = alu_result;
-    // TODO: Branch logic should be implemented.
+
+    // TODO: Branch (B type instructions) logic should be implemented.
+    branch_taken_o  = (id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr);
   end
 
   always_comb begin : alu_op_comb
