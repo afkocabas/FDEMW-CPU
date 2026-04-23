@@ -7,8 +7,8 @@ module fetch_2 (
 
     input logic stall_i,
 
-    input logic  redirect_i,
-    input addr_t redirect_pc_i,
+    input logic  branch_taken_i,
+    input addr_t redirect_addr_i,
 
     output if_id_reg_t if_id_o,
     imem_if.fetch imem_if
@@ -35,8 +35,8 @@ module fetch_2 (
     if (res_i) begin
       imem_if.inst_addr = '0;
       imem_if.req_valid = LOW;
-    end else if (redirect_i) begin
-      pc_d = redirect_pc_i;
+    end else if (branch_taken_i) begin
+      pc_d = redirect_addr_i;
       drop_req_d = HIGH;
     end else if (stall_i) begin
       if (req_flight_q) begin
