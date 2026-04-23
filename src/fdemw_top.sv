@@ -23,12 +23,18 @@ module fdemw_top (
   // ------------- Fetch --------------------
   if_id_reg_t if_id_o;
 
+  logic branch_taken;
+  addr_t redirect_addr;
+
   fetch_2 fetch_core (
       .clk_i(clk_i),
       .res_i(res_i),
       // .stall_i(stall_i),
 
       .imem_if(imem_iff.fetch),
+
+      .branch_taken_i (branch_taken),
+      .redirect_addr_i(redirect_addr),
 
       .if_id_o(if_id_o)
   );
@@ -121,7 +127,11 @@ module fdemw_top (
       .forward_sel_b_i(forward_sel_b),
 
       .mem_forward_op_i(mem_forward_op),
-      .exe_forward_op_i(exe_forward_op)
+      .exe_forward_op_i(exe_forward_op),
+
+      .branch_taken_o (branch_taken),
+      .redirect_addr_o(redirect_addr)
+
   );
 
   // ------------- Memory --------------------
@@ -215,8 +225,7 @@ module fdemw_top (
   control_unit control_unit (
       .memory_stall_i(mem_stall),
 
-      // TODO: Add branch logic
-      // input logic branch_taken_i,
+      .branch_taken_i(branch_taken),
 
       .pipeline_stall_o(pipeline_stall),
       .flush_frontend_o(flush_frontend)
