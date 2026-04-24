@@ -26,7 +26,7 @@ module fdemw_top (
   logic branch_taken;
   addr_t redirect_addr;
 
-  fetch_2 fetch_core (
+  fetch fetch_core (
       .clk_i(clk_i),
       .res_i(res_i),
       // .stall_i(stall_i),
