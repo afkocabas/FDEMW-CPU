@@ -1,7 +1,7 @@
 import fdemw_pkg::*;
 import riscv32i_pkg::*;
 
-module fetch (
+module fetch_depr (
     input logic res_i,
     input logic clk_i,
 
