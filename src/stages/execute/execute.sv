@@ -17,13 +17,6 @@ module execute (
   gp_reg_t op_b;
   gp_reg_t alu_result;
 
-  always_comb begin : signal_o_comb
-    redirect_addr_o = alu_result;
-
-    // TODO: Branch (B type instructions) logic should be implemented.
-    branch_taken_o  = (id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr);
-  end
-
   always_comb begin : alu_op_comb
     op_a = '0;
     op_b = '0;
@@ -70,6 +63,11 @@ module execute (
     exe_mem_reg_o.id_exe_reg.rs2_data = mem_forward_op_i;
 
     exe_mem_reg_o.alu_result = alu_result;
+
+    redirect_addr_o = alu_result;
+
+    // TODO: Branch (B type instructions) logic should be implemented.
+    branch_taken_o = (id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr);
   end
 
 endmodule
