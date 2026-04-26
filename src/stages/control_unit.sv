@@ -12,5 +12,6 @@ module control_unit (
 
   always_comb begin : output_comb
     pipeline_stall_o = memory_stall_i;
+    flush_frontend_o = branch_taken_i;
   end
 endmodule
