@@ -14,6 +14,16 @@ module fetch (
     imem_if.fetch imem_if
 );
 
+  // DEBUG Signals
+  inst_t fetch_inst_o;
+  addr_t fetch_pc_o;
+
+  always_comb begin : debug_signals
+    fetch_inst_o = if_id_o.inst;
+    fetch_pc_o   = if_id_o.pc;
+  end
+
+
   addr_t pc_q, pc_d;
   addr_t pc_req_q, pc_req_d;
   logic req_flight_q, req_flight_d;
