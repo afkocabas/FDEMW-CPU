@@ -243,6 +243,9 @@ module fdemw_top (
       id_exe_reg_d  = '0;
       exe_mem_reg_d = '0;
       mem_wb_reg_d  = '0;
+    end else if (flush_frontend) begin
+      if_id_reg_d  = '0;
+      id_exe_reg_d = '0;
     end else if (pipeline_stall) begin
       if_id_reg_d   = if_id_reg_q;
       id_exe_reg_d  = id_exe_reg_q;
