@@ -13,6 +13,17 @@ module execute (
 
 );
 
+
+  // DEBUG signals
+
+  addr_t exe_pc;
+  inst_t exe_inst;
+
+  always_comb begin : debug_signals
+    exe_pc   = id_exe_reg_i.pc;
+    exe_inst = id_exe_reg_i.inst;
+  end
+
   gp_reg_t op_a;
   gp_reg_t op_b;
   gp_reg_t alu_result;
@@ -53,6 +64,8 @@ module execute (
 
   always_comb begin : output_comb
     exe_mem_reg_o.id_exe_reg = id_exe_reg_i;
+    branch_taken_o = LOW;
+    redirect_addr_o = '0;
 
     if (forward_sel_a_i == FORWARD_FROM_EXE) exe_mem_reg_o.id_exe_reg.rs1_data = exe_forward_op_i;
     else if (forward_sel_a_i == FORWARD_FROM_MEM);
@@ -64,10 +77,22 @@ module execute (
 
     exe_mem_reg_o.alu_result = alu_result;
 
-    redirect_addr_o = alu_result;
+    if (id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr) begin
+      branch_taken_o = HIGH;
+    end else begin
+      unique case (id_exe_reg_i.branch_type)
+        BR_BEQ:  branch_taken_o = (alu_result == '0);
+        BR_BNE:  branch_taken_o = (alu_result != '0);
+        BR_BLT:  branch_taken_o = ($signed(op_a) < $signed(op_b));
+        BR_BGE:  branch_taken_o = ($signed(op_a) >= $signed(op_b));
+        BR_BLTU: branch_taken_o = (op_a < op_b);
+        BR_BGEU: branch_taken_o = (op_a >= op_b);
+      endcase
+    end
 
-    // TODO: Branch (B type instructions) logic should be implemented.
-    branch_taken_o = (id_exe_reg_i.is_jal || id_exe_reg_i.is_jalr);
+    if (branch_taken_o) begin
+      redirect_addr_o = id_exe_reg_i.pc + id_exe_reg_i.imm;
+    end
   end
 
 endmodule
